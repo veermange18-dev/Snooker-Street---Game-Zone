@@ -1,0 +1,4117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="icon" type="image/png" href="img/logo2.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snooker Street – Game Zone</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700;800&family=Orbitron:wght@400;600;700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    :root {
+      --g1: #00FF88;
+      --g2: #00C853;
+      --g3: #00843D;
+      --g4: #004D25;
+      --bg: #030F07;
+      --bg2: #060F0A;
+      --surface: #0A1A0F;
+      --surface2: #0F2416;
+      --surface3: #122B1A;
+      --white: #E8FFE8;
+      --dim: #4A7A5A;
+      --dim2: #6A9A7A;
+      --accent: #39FF84;
+      --warn: #FF6B35;
+      --err: #FF3B5C;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Exo 2', sans-serif;
+      overflow-x: hidden;
+      padding-top: 100px;
+      /* This creates the space for the fixed nav */
+    }
+
+    ::-webkit-scrollbar {
+      width: 3px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--g2);
+      border-radius: 2px
+    }
+
+    /* ══ PRELOADER ══ */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-direction: column;
+      gap: 0
+    }
+
+
+
+
+
+    .pre-bar-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, transparent, var(--g1), var(--g2));
+      animation: barFill 2.4s ease 0.1s forwards;
+      box-shadow: 0 0 8px var(--g1)
+    }
+
+    @keyframes barFill {
+      to {
+        width: 100%
+      }
+    }
+
+    @keyframes preIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* ══ NAV ══ */
+    /* Ensure your nav has a defined height */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      /* Set a specific height */
+      z-index: 200;
+      padding: 0 52px;
+      /* Remove top/bottom padding */
+      display: flex;
+      align-items: center;
+      /* This keeps everything vertically centered */
+      justify-content: space-between;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+
+    nav.stuck {
+      background: rgba(3, 15, 7, 0.88);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      padding: 13px 52px;
+      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.5)
+    }
+
+    nav.stuck::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+          transparent,
+          var(--g1),
+          var(--accent),
+          var(--g1),
+          transparent);
+      background-size: 200% auto;
+      animation: navLine 4s linear infinite;
+    }
+
+    @keyframes navLine {
+      0% {
+        background-position: 0% center
+      }
+
+      100% {
+        background-position: 200% center
+      }
+    }
+
+    .nbrand {
+      display: flex;
+      align-items: center;
+      gap: 13px
+    }
+
+    .nbrand img {
+      width: 70px;
+      height: auto;
+
+    }
+
+    .nbrand img:hover {}
+
+    .nbrand span {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--g1)
+    }
+
+    .nlinks {
+      display: flex;
+      gap: 34px;
+      list-style: none
+    }
+
+    .nlinks a {
+      color: var(--dim2);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      transition: color 0.2s;
+      position: relative
+    }
+
+    .nlinks a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--g1);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+      transform-origin: left
+    }
+
+    .nlinks a:hover {
+      color: var(--g1)
+    }
+
+    .nlinks a:hover::after {
+      transform: scaleX(1)
+    }
+
+    .nbtn {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border: 1px solid var(--g2);
+      cursor: pointer;
+      background: transparent;
+      color: var(--g1);
+      transition: all 0.25s;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)
+    }
+
+    .nbtn:hover {
+      background: var(--g2);
+      color: #000;
+      box-shadow: 0 0 30px rgba(0, 200, 83, 0.4), inset 0 0 20px rgba(0, 255, 136, 0.1)
+    }
+
+    /* ══ SCROLL TO TOP BUTTON ══ */
+    .scroll-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 46px;
+      height: 46px;
+      background: var(--surface);
+      border: 1px solid var(--g2);
+      color: var(--g1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 199;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .scroll-to-top.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .scroll-to-top:hover {
+      background: var(--g2);
+      color: #000;
+      transform: translateY(-3px);
+      box-shadow: 0 0 24px rgba(0, 255, 136, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.2);
+      border-color: var(--g1);
+    }
+
+    .scroll-to-top svg {
+      fill: currentColor;
+      transition: transform 0.2s;
+    }
+
+    .scroll-to-top:hover svg {
+      transform: translateY(-2px);
+    }
+
+    /* ══ HERO ══ */
+    #hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      padding: 0 24px
+    }
+
+    .hvid {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.1
+    }
+
+    .hvig {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 45%, rgba(10, 26, 15, 0.4) 0%, rgba(3, 15, 7, 0.97) 72%)
+    }
+
+    .hfelt {
+      position: absolute;
+      inset: 0;
+      opacity: 0.035;
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 136, 0.4) 2px, rgba(0, 255, 136, 0.4) 3px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 136, 0.4) 2px, rgba(0, 255, 136, 0.4) 3px)
+    }
+
+    /* Cue light rays */
+    .hray {
+      position: absolute;
+      width: 900px;
+      height: 1px;
+      left: 50%;
+      top: 50%;
+      transform-origin: left center;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.15), transparent);
+      animation: rayPulse 5s ease-in-out infinite
+    }
+
+    .hray:nth-child(1) {
+      transform: translateX(-50%) rotate(-12deg);
+      animation-delay: 0s
+    }
+
+    .hray:nth-child(2) {
+      transform: translateX(-50%) rotate(8deg);
+      animation-delay: 1.5s;
+      opacity: 0.6
+    }
+
+    .hray:nth-child(3) {
+      transform: translateX(-50%) rotate(-30deg);
+      animation-delay: 3s;
+      opacity: 0.4
+    }
+
+    @keyframes rayPulse {
+
+      0%,
+      100% {
+        opacity: 0.3
+      }
+
+      50% {
+        opacity: 0.8
+      }
+    }
+
+    /* Particle dots */
+    .hparticle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--g1);
+      animation: particleDrift linear infinite;
+      pointer-events: none
+    }
+
+    @keyframes particleDrift {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.6
+      }
+
+      100% {
+        transform: translateY(-100vh) scale(0);
+        opacity: 0
+      }
+    }
+
+    .hcontent {
+      position: relative;
+      z-index: 2;
+      max-width: 860px
+    }
+
+    .heyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 10px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--g2);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: riseUp 0.8s ease 3.2s forwards
+    }
+
+    .heyebrow::before,
+    .heyebrow::after {
+      content: '';
+      height: 1px;
+      width: 44px;
+      background: linear-gradient(90deg, transparent, var(--g2))
+    }
+
+    .heyebrow::after {
+      background: linear-gradient(90deg, var(--g2), transparent)
+    }
+
+    .hh1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(48px, 9.5vw, 116px);
+      font-weight: 900;
+      line-height: 0.88;
+      letter-spacing: 4px;
+      opacity: 0;
+      animation: riseUp 0.9s ease 3.4s forwards
+    }
+
+    .hl1 {
+      display: block;
+      color: var(--white)
+    }
+
+    .hl2 {
+      display: block;
+      background: linear-gradient(135deg, var(--g1) 0%, #fff 40%, var(--g2) 70%, var(--g1) 100%);
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: greenShine 3s linear infinite 4s
+    }
+
+    @keyframes greenShine {
+      0% {
+        background-position: 0% center
+      }
+
+      100% {
+        background-position: 300% center
+      }
+    }
+
+    .hsub {
+      margin-top: 22px;
+      font-size: 15px;
+      color: var(--dim2);
+      line-height: 1.8;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      opacity: 0;
+      animation: riseUp 0.8s ease 3.6s forwards
+    }
+
+    .hctas {
+      margin-top: 42px;
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: riseUp 0.8s ease 3.8s forwards
+    }
+
+    .btn-green {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 15px 38px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--g2), var(--g3));
+      color: #fff;
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+      transition: transform 0.2s, box-shadow 0.3s, filter 0.2s;
+      position: relative;
+      overflow: hidden
+    }
+
+    .btn-green::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), transparent);
+      opacity: 0;
+      transition: opacity 0.3s
+    }
+
+    .btn-green:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(0, 200, 83, 0.45), 0 0 80px rgba(0, 255, 136, 0.15);
+      filter: brightness(1.15)
+    }
+
+    .btn-green:hover::after {
+      opacity: 1
+    }
+
+    .btn-outline-g {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 14px 34px;
+      cursor: pointer;
+      background: transparent;
+      color: var(--g1);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      transition: all 0.25s
+    }
+
+    .btn-outline-g:hover {
+      border-color: var(--g1);
+      background: rgba(0, 255, 136, 0.07);
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.15), inset 0 0 20px rgba(0, 255, 136, 0.05)
+    }
+
+    .hstats {
+      margin-top: 68px;
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      border: 1px solid rgba(0, 255, 136, 0.12);
+      opacity: 0;
+      animation: riseUp 0.8s ease 4s forwards
+    }
+
+    .hst {
+      padding: 26px 38px;
+      text-align: center;
+      border-right: 1px solid rgba(0, 255, 136, 0.1);
+      transition: background 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden
+    }
+
+    .hst:last-child {
+      border-right: none
+    }
+
+    .hst::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 100%, rgba(0, 255, 136, 0.08), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s
+    }
+
+    .hst:hover::before {
+      opacity: 1
+    }
+
+    .hst:hover {
+      background: rgba(0, 255, 136, 0.04)
+    }
+
+    .hst-n {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--g1);
+      line-height: 1;
+      text-shadow: 0 0 30px rgba(0, 255, 136, 0.5)
+    }
+
+    .hst-l {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-top: 5px
+    }
+
+    .scroll-cue {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      opacity: 0;
+      animation: fadeIn 1s ease 5s forwards
+    }
+
+    .scroll-cue span {
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: var(--dim);
+      text-transform: uppercase
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 44px;
+      background: linear-gradient(180deg, rgba(0, 255, 136, 0.6), transparent);
+      animation: scrollAnim 2s ease infinite
+    }
+
+    @keyframes scrollAnim {
+
+      0%,
+      100% {
+        opacity: 0.6;
+        transform: scaleY(0.4);
+        transform-origin: top
+      }
+
+      50% {
+        opacity: 1;
+        transform: scaleY(1)
+      }
+    }
+
+    @keyframes riseUp {
+      from {
+        opacity: 0;
+        transform: translateY(32px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    /* ══ DIVIDER ══ */
+    .div {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.1), transparent)
+    }
+
+    /* ══ SECTION GLOBALS ══ */
+    section {
+      padding: 108px 24px
+    }
+
+    .cnt {
+      max-width: 1120px;
+      margin: 0 auto
+    }
+
+    .slabel {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 9px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--g2);
+      margin-bottom: 14px
+    }
+
+    .slabel::before {
+      content: '';
+      width: 22px;
+      height: 1px;
+      background: var(--g2)
+    }
+
+    .sh2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(34px, 5vw, 62px);
+      font-weight: 900;
+      line-height: 0.93;
+      letter-spacing: 2px;
+      margin-bottom: 16px
+    }
+
+    .sh2 em {
+      font-style: normal;
+      color: var(--g1);
+      text-shadow: 0 0 40px rgba(0, 255, 136, 0.5), 0 0 80px rgba(0, 255, 136, 0.2)
+    }
+
+    .sdesc {
+      font-size: 14px;
+      color: var(--dim2);
+      line-height: 1.8;
+      max-width: 500px
+    }
+
+    .rv {
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 0.75s ease, transform 0.75s ease
+    }
+
+    .rv.on {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    .rv.d1 {
+      transition-delay: 0.1s
+    }
+
+    .rv.d2 {
+      transition-delay: 0.2s
+    }
+
+    .rv.d3 {
+      transition-delay: 0.3s
+    }
+
+    .rv.d4 {
+      transition-delay: 0.4s
+    }
+
+    /* Global ambient glow orbs */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 20%;
+      left: -10%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 255, 136, 0.025), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      animation: orbFloat1 12s ease-in-out infinite
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: 10%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 180, 60, 0.02), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      animation: orbFloat2 15s ease-in-out infinite
+    }
+
+    @keyframes orbFloat1 {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1)
+      }
+
+      50% {
+        transform: translateY(-40px) scale(1.05)
+      }
+    }
+
+    @keyframes orbFloat2 {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1)
+      }
+
+      50% {
+        transform: translateY(30px) scale(0.95)
+      }
+    }
+
+    /* ══ TABLES ══ */
+    #tables {
+      background: var(--bg2)
+    }
+
+    .tgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1px;
+      background: rgba(0, 255, 136, 0.07);
+      margin-top: 58px
+    }
+
+    .tc {
+      background: var(--bg2);
+      padding: 38px 34px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.4s, transform 0.3s;
+      cursor: default
+    }
+
+    .tc::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--g2), var(--g1), transparent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s
+    }
+
+    .tc::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 0%, rgba(0, 255, 136, 0.07), transparent 65%);
+      opacity: 0;
+      transition: opacity 0.4s
+    }
+
+    /* Bottom-right corner glow on hover */
+    .tc .cglow {
+      position: absolute;
+      bottom: -80px;
+      right: -80px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 255, 136, 0.12), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.5s, transform 0.5s;
+      transform: scale(0.7)
+    }
+
+    .tc:hover {
+      background: var(--surface);
+      transform: translateY(-3px)
+    }
+
+    .tc:hover::before {
+      transform: scaleX(1)
+    }
+
+    .tc:hover::after {
+      opacity: 1
+    }
+
+    .tc:hover .cglow {
+      opacity: 1;
+      transform: scale(1)
+    }
+
+    .tcbgn {
+      position: absolute;
+      right: 18px;
+      top: 12px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 90px;
+      font-weight: 900;
+      color: rgba(0, 255, 136, 0.04);
+      line-height: 1;
+      pointer-events: none
+    }
+
+    .tctype {
+      font-size: 9px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--g2);
+      margin-bottom: 10px
+    }
+
+    .tcname {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 22px;
+      letter-spacing: 1px
+    }
+
+    .tcprice {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 54px;
+      font-weight: 900;
+      color: var(--g1);
+      line-height: 1;
+      text-shadow: 0 0 40px rgba(0, 255, 136, 0.4)
+    }
+
+    .tc.ps5 .tcprice {
+      color: #4FC3F7;
+      text-shadow: 0 0 40px rgba(79, 195, 247, 0.4)
+    }
+
+    .tcpsub {
+      font-size: 11px;
+      color: var(--dim2);
+      margin-bottom: 26px;
+      letter-spacing: 1px
+    }
+
+    .tcfeats {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px
+    }
+
+    .tcfeats li {
+      font-size: 13px;
+      color: rgba(232, 255, 232, 0.65);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 11px;
+      border-bottom: 1px solid rgba(0, 255, 136, 0.06)
+    }
+
+    .tcfeats li:last-child {
+      border-bottom: none;
+      padding-bottom: 0
+    }
+
+    .tcfeats li::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: var(--g2);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+      box-shadow: 0 0 6px rgba(0, 255, 136, 0.6)
+    }
+
+    .tc.ps5 .tcfeats li::before {
+      background: #4FC3F7;
+      box-shadow: 0 0 6px rgba(79, 195, 247, 0.6)
+    }
+
+    /* ══ BOOKING ══ */
+    #booking {
+      background: var(--bg);
+      position: relative;
+      overflow: hidden
+    }
+
+    #booking::before {
+      content: '';
+      position: absolute;
+      top: -180px;
+      right: -180px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 255, 136, 0.04), transparent 70%);
+      pointer-events: none
+    }
+
+    #booking::after {
+      content: '';
+      position: absolute;
+      bottom: -200px;
+      left: -200px;
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 180, 60, 0.03), transparent 70%);
+      pointer-events: none
+    }
+
+    .bgrid {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 76px;
+      align-items: start;
+      margin-top: 58px
+    }
+
+    .bsteps {
+      display: flex;
+      flex-direction: column
+    }
+
+    .bstep {
+      display: flex;
+      gap: 0;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0, 255, 136, 0.06)
+    }
+
+    .bstep:last-child {
+      border-bottom: none
+    }
+
+    .bsnum {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 24px;
+      font-weight: 900;
+      color: rgba(0, 255, 136, 0.1);
+      line-height: 1;
+      width: 40px;
+      flex-shrink: 0
+    }
+
+    .bsbody h4 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+      letter-spacing: 1px
+    }
+
+    .bsbody p {
+      font-size: 13px;
+      color: var(--dim2);
+      line-height: 1.7
+    }
+
+    /* Form */
+    .bform {
+      background: var(--surface);
+      border: 1px solid rgba(0, 255, 136, 0.12);
+      padding: 42px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .bform::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--g3), var(--g1), var(--g2), var(--g1), var(--g3));
+      background-size: 200% auto;
+      animation: topShimmer 3s linear infinite
+    }
+
+    @keyframes topShimmer {
+      0% {
+        background-position: 0% center
+      }
+
+      100% {
+        background-position: 200% center
+      }
+    }
+
+    /* Subtle inner glow on hover */
+    .bform:hover {
+      box-shadow: 0 0 60px rgba(0, 255, 136, 0.05), inset 0 0 40px rgba(0, 255, 136, 0.02)
+    }
+
+    .ftitle {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--g1);
+      letter-spacing: 2px;
+      margin-bottom: 30px
+    }
+
+    .tsel {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-bottom: 22px
+    }
+
+    .tso {
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      padding: 15px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden
+    }
+
+    .tso::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 255, 136, 0.15), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s
+    }
+
+    .tso:hover {
+      border-color: rgba(0, 255, 136, 0.4);
+      background: rgba(0, 255, 136, 0.05)
+    }
+
+    .tso:hover::after {
+      opacity: 1
+    }
+
+    .tso.on {
+      border-color: var(--g2);
+      background: rgba(0, 255, 136, 0.08);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1), inset 0 0 15px rgba(0, 255, 136, 0.05)
+    }
+
+    .tso.on .tsn {
+      color: var(--g1)
+    }
+
+    .tsn {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      display: block;
+      color: var(--white);
+      margin-bottom: 3px;
+      letter-spacing: 1px;
+      transition: color 0.2s
+    }
+
+    .tsp {
+      font-size: 10px;
+      color: var(--dim2)
+    }
+
+    .fgrow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px
+    }
+
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+      position: relative
+    }
+
+    .fg label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dim2)
+    }
+
+    .fg input,
+    .fg select {
+      background: rgba(0, 255, 136, 0.03);
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      color: var(--white);
+      padding: 12px 15px;
+      font-size: 13px;
+      font-family: 'Exo 2', sans-serif;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      border-radius: 0
+    }
+
+    .fg input:focus,
+    .fg select:focus {
+      border-color: var(--g2);
+      box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.08), 0 0 20px rgba(0, 255, 136, 0.05)
+    }
+
+    .fg select option {
+      background: #0A1A0F
+    }
+
+    .fg input.err,
+    .fg select.err {
+      border-color: var(--err) !important;
+      box-shadow: 0 0 0 3px rgba(255, 59, 92, 0.12), 0 0 15px rgba(255, 59, 92, 0.08) !important;
+      animation: shake 0.35s ease
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      20% {
+        transform: translateX(-5px)
+      }
+
+      40% {
+        transform: translateX(5px)
+      }
+
+      60% {
+        transform: translateX(-4px)
+      }
+
+      80% {
+        transform: translateX(4px)
+      }
+    }
+
+    .ferr {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--err);
+      margin-top: 4px;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: all 0.25s;
+      pointer-events: none
+    }
+
+    .ferr.show {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    .ferr::before {
+      content: '!';
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--err);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    /* Validation popup */
+    .val-toast {
+      position: fixed;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-30px);
+      background: linear-gradient(135deg, rgba(6, 15, 10, 0.99), rgba(10, 26, 15, 0.99));
+      border: 1px solid rgba(255, 59, 92, 0.5);
+      padding: 18px 26px 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      z-index: 999;
+      min-width: 340px;
+      max-width: 92vw;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 50px rgba(0, 0, 0, 0.7), 0 0 50px rgba(255, 59, 92, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+    }
+
+    .val-toast::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--err), rgba(255, 59, 92, 0.5), transparent)
+    }
+
+    .val-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: all
+    }
+
+    .vt-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 59, 92, 0.12);
+      border: 1px solid rgba(255, 59, 92, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+      box-shadow: 0 0 16px rgba(255, 59, 92, 0.2);
+      animation: iconPulse 1.8s ease infinite
+    }
+
+    @keyframes iconPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 16px rgba(255, 59, 92, 0.2)
+      }
+
+      50% {
+        box-shadow: 0 0 28px rgba(255, 59, 92, 0.5)
+      }
+    }
+
+    .vt-body {
+      flex: 1
+    }
+
+    .vt-body h5 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--err);
+      margin-bottom: 3px;
+      letter-spacing: 2px
+    }
+
+    .vt-body p {
+      font-size: 11px;
+      color: var(--dim2);
+      letter-spacing: 0.5px
+    }
+
+    .vt-close {
+      margin-left: 4px;
+      background: none;
+      border: none;
+      color: var(--dim2);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+      transition: color 0.2s, text-shadow 0.2s;
+      flex-shrink: 0
+    }
+
+    .vt-close:hover {
+      color: var(--err);
+      text-shadow: 0 0 12px rgba(255, 59, 92, 0.6)
+    }
+
+    /* Field list inside toast */
+    .vt-fields {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px
+    }
+
+    .vt-field-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border: 1px solid rgba(255, 59, 92, 0.35);
+      color: var(--err);
+      background: rgba(255, 59, 92, 0.08);
+      font-family: 'Rajdhani', sans-serif;
+      position: relative;
+      overflow: hidden
+    }
+
+    .vt-field-tag::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 59, 92, 0.1), transparent);
+    }
+
+    /* Table selector error state */
+    .tsel.tsel-err {
+      animation: tselShake 0.4s ease, tselGlow 0.4s ease
+    }
+
+    @keyframes tselShake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      20% {
+        transform: translateX(-5px)
+      }
+
+      40% {
+        transform: translateX(5px)
+      }
+
+      60% {
+        transform: translateX(-4px)
+      }
+
+      80% {
+        transform: translateX(3px)
+      }
+    }
+
+    @keyframes tselGlow {
+
+      0%,
+      100% {
+        box-shadow: none
+      }
+
+      50% {
+        box-shadow: 0 0 0 2px rgba(255, 59, 92, 0.5), 0 0 20px rgba(255, 59, 92, 0.2)
+      }
+    }
+
+    /* Enhanced hover glow for table cards */
+    .tc:hover {
+      background: var(--surface);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 255, 136, 0.06)
+    }
+
+    .tso.on {
+      border-color: var(--g1);
+      background: rgba(0, 255, 136, 0.1);
+      box-shadow: 0 0 24px rgba(0, 255, 136, 0.15), inset 0 0 20px rgba(0, 255, 136, 0.06)
+    }
+
+    .tso.on .tsn {
+      color: var(--g1);
+      text-shadow: 0 0 14px rgba(0, 255, 136, 0.5)
+    }
+
+    /* Extra green scanline shimmer on form */
+    .bform {
+      background: var(--surface);
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      padding: 42px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.4s
+    }
+
+    .bform::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 255, 136, 0.008) 3px, rgba(0, 255, 136, 0.008) 4px);
+      pointer-events: none
+    }
+
+    .pnote {
+      background: rgba(0, 255, 136, 0.04);
+      border-left: 2px solid var(--g3);
+      padding: 13px 17px;
+      font-size: 12px;
+      color: var(--dim2);
+      line-height: 1.7;
+      margin-bottom: 18px
+    }
+
+    .sbtn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--g2) 0%, var(--g1) 50%, var(--g2) 100%);
+      background-size: 200% auto;
+      color: #000;
+      border: none;
+      padding: 17px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+      position: relative;
+      overflow: hidden;
+      transition: background-position 0.5s ease, transform 0.2s ease, box-shadow 0.35s ease, letter-spacing 0.2s ease;
+      box-shadow: 0 0 0 0 transparent;
+    }
+
+    /* sweep shimmer */
+    .sbtn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+      transition: left 0.55s ease;
+      pointer-events: none;
+    }
+
+    /* bottom edge glow line */
+    .sbtn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #fff, transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .sbtn:hover {
+      background-position: right center;
+      color: #000;
+      transform: translateY(-3px) scale(1.01);
+      letter-spacing: 6px;
+      box-shadow:
+        0 0 18px rgba(0, 255, 136, 0.7),
+        0 0 40px rgba(0, 255, 136, 0.4),
+        0 0 80px rgba(0, 255, 136, 0.15),
+        0 8px 30px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .sbtn:hover::before {
+      left: 140%
+    }
+
+    .sbtn:hover::after {
+      opacity: 1
+    }
+
+    .sbtn:active {
+      transform: translateY(-1px) scale(0.99);
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.5), 0 4px 15px rgba(0, 0, 0, 0.3)
+    }
+
+    /* Pay button reveal */
+    .sbtn.reveal {
+      display: block !important;
+      animation: payReveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards
+    }
+
+    @keyframes payReveal {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.97)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1)
+      }
+    }
+
+    /* Neon glow on nav brand hover */
+    .nbrand span:hover {
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.8)
+    }
+
+    .pnote strong {
+      color: var(--g2)
+    }
+
+    .payicons {
+      display: flex;
+      gap: 7px;
+      margin-top: 9px;
+      flex-wrap: wrap
+    }
+
+    .picon {
+      background: rgba(0, 255, 136, 0.04);
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      padding: 4px 11px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--dim2);
+      letter-spacing: 1px;
+      font-family: 'Rajdhani', sans-serif
+    }
+
+    .psum {
+      background: rgba(0, 255, 136, 0.05);
+      /* Slightly darker/more contrast */
+      border: 1px solid var(--g3);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .psum.on {
+      display: block
+    }
+
+    .prow {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--dim2);
+      margin-bottom: 7px
+    }
+
+    .prow.tot {
+      color: var(--g1);
+      font-weight: 700;
+      font-size: 16px;
+      border-top: 1px solid rgba(0, 255, 136, 0.12);
+      padding-top: 11px;
+      margin-top: 4px;
+      font-family: 'Orbitron', sans-serif;
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.3)
+    }
+
+    /* ══ BOOKING FORM UX UPGRADE ══ */
+    /* Step sections */
+    .fstep {
+      margin-bottom: 26px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(0, 255, 136, 0.06)
+    }
+
+    .fstep:last-of-type {
+      border-bottom: none
+    }
+
+    .fstep-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--g2);
+      margin-bottom: 13px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 600
+    }
+
+    .fstep-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0, 255, 136, 0.12);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: var(--g1);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .freq {
+      color: var(--err);
+      margin-left: 2px
+    }
+
+    /* Table selector bigger cards */
+    .tso-icon {
+      font-size: 22px;
+      margin-bottom: 5px;
+      display: block
+    }
+
+    .tso {
+      border: 1px solid rgba(0, 255, 136, 0.12);
+      padding: 16px 8px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.22s;
+      position: relative;
+      overflow: hidden;
+      background: rgba(0, 255, 136, 0.02)
+    }
+
+    .tso:hover {
+      border-color: rgba(0, 255, 136, 0.45);
+      background: rgba(0, 255, 136, 0.07);
+      transform: translateY(-2px)
+    }
+
+    .tso.on {
+      border-color: var(--g1);
+      background: rgba(0, 255, 136, 0.1);
+      box-shadow: 0 0 22px rgba(0, 255, 136, 0.18), inset 0 0 14px rgba(0, 255, 136, 0.06)
+    }
+
+    .tso.on::after {
+      content: '✓';
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: 10px;
+      color: var(--g1);
+      font-weight: 700
+    }
+
+    .tso.on .tsn {
+      color: var(--g1);
+      text-shadow: 0 0 12px rgba(0, 255, 136, 0.5)
+    }
+
+    /* Quick date chips */
+    .date-chips {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 11px
+    }
+
+    .dchip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      color: var(--dim2);
+      cursor: pointer;
+      background: rgba(0, 255, 136, 0.03);
+      transition: all 0.18s;
+      letter-spacing: 0.5px;
+      font-family: 'Rajdhani', sans-serif
+    }
+
+    .dchip:hover {
+      border-color: rgba(0, 255, 136, 0.5);
+      color: var(--g1);
+      background: rgba(0, 255, 136, 0.07)
+    }
+
+    .dchip.active {
+      border-color: var(--g1);
+      color: var(--g1);
+      background: rgba(0, 255, 136, 0.1);
+      box-shadow: 0 0 12px rgba(0, 255, 136, 0.12)
+    }
+
+    /* Bigger input fields */
+    .fg label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--dim2);
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .fg input,
+    .fg select {
+      background: rgba(0, 255, 136, 0.04);
+      border: 1px solid rgba(0, 255, 136, 0.12);
+      color: var(--white);
+      padding: 14px 16px;
+      font-size: 14px;
+      font-family: 'Exo 2', sans-serif;
+      outline: none;
+      transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+      border-radius: 0;
+      width: 100%
+    }
+
+    .fg input:focus,
+    .fg select:focus {
+      border-color: var(--g1);
+      background: rgba(0, 255, 136, 0.06);
+      box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1), 0 0 24px rgba(0, 255, 136, 0.06)
+    }
+
+    .fg input::placeholder {
+      color: rgba(106, 154, 122, 0.5)
+    }
+
+    .fg select option {
+      background: #0A1A0F;
+      color: var(--white)
+    }
+
+    .fg select optgroup {
+      color: var(--g2);
+      font-style: normal;
+      font-size: 11px
+    }
+
+    .fphone-hint {
+      font-size: 10px;
+      color: rgba(106, 154, 122, 0.6);
+      margin-top: 4px;
+      letter-spacing: 0.5px
+    }
+
+    /* Player stepper */
+    .player-stepper {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 12px;
+      width: fit-content
+    }
+
+    .ps-btn {
+      width: 46px;
+      height: 52px;
+      background: rgba(0, 255, 136, 0.06);
+      border: 1px solid rgba(0, 255, 136, 0.18);
+      color: var(--g1);
+      font-size: 22px;
+      font-weight: 300;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      user-select: none
+    }
+
+    .ps-btn:hover {
+      background: rgba(0, 255, 136, 0.14);
+      border-color: var(--g1);
+      box-shadow: 0 0 16px rgba(0, 255, 136, 0.2);
+      color: #000;
+      background: var(--g1)
+    }
+
+    .ps-btn:active {
+      transform: scale(0.94)
+    }
+
+    .ps-display {
+      width: 90px;
+      height: 52px;
+      border-top: 1px solid rgba(0, 255, 136, 0.18);
+      border-bottom: 1px solid rgba(0, 255, 136, 0.18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 255, 136, 0.03)
+    }
+
+    .ps-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--g1);
+      line-height: 1;
+      text-shadow: 0 0 16px rgba(0, 255, 136, 0.5)
+    }
+
+    .ps-sub {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--dim2);
+      margin-top: 2px
+    }
+
+    .player-icons {
+      font-size: 18px;
+      letter-spacing: 4px;
+      color: rgba(0, 255, 136, 0.6);
+      margin-bottom: 4px;
+      min-height: 26px;
+      transition: all 0.2s
+    }
+
+    /* Summary box upgrade */
+    .psum {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(0, 100, 40, 0.04));
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      display: none;
+      position: relative;
+      overflow: hidden
+    }
+
+    .psum::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.5), transparent)
+    }
+
+    .psum.on {
+      display: block;
+      animation: sumReveal 0.4s ease
+    }
+
+    @keyframes sumReveal {
+      from {
+        opacity: 0;
+        transform: translateY(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .psum-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--g2);
+      margin-bottom: 12px;
+      text-transform: uppercase
+    }
+
+    #tournaments {
+      background: var(--bg2)
+    }
+
+    .trnhdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 46px;
+      flex-wrap: wrap;
+      gap: 16px
+    }
+
+    .lbadge {
+      background: rgba(255, 59, 92, 0.12);
+      border: 1px solid rgba(255, 59, 92, 0.3);
+      color: #FF3B5C;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Rajdhani', sans-serif
+    }
+
+    .ldot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #FF3B5C;
+      animation: liveDot 1.2s infinite
+    }
+
+    @keyframes liveDot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: 0.3;
+        transform: scale(0.6)
+      }
+    }
+
+    .trngrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 1px;
+      background: rgba(0, 255, 136, 0.07)
+    }
+
+    .tcard {
+      background: var(--bg2);
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.35s, transform 0.3s
+    }
+
+    .tcard::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, transparent, var(--g2), transparent);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.4s
+    }
+
+    .tcard:hover {
+      background: var(--surface);
+      transform: translateY(-4px)
+    }
+
+    .tcard:hover::before {
+      transform: scaleY(1)
+    }
+
+    /* Spotlight hover effect */
+    .tcard .tglow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 255, 136, 0.08), transparent 70%);
+      top: -100px;
+      right: -100px;
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none
+    }
+
+    .tcard:hover .tglow {
+      opacity: 1
+    }
+
+    .tw {
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: var(--g2);
+      text-transform: uppercase;
+      margin-bottom: 11px
+    }
+
+    .tname {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 14px;
+      letter-spacing: 1px
+    }
+
+    .tdets {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 16px;
+      flex-wrap: wrap
+    }
+
+    .tdet {
+      font-size: 12px;
+      color: var(--dim2)
+    }
+
+    .tdet span {
+      color: var(--white);
+      font-weight: 600
+    }
+
+    /* Prize breakdown */
+    .tprizes {
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.04), rgba(0, 100, 40, 0.03));
+      margin-bottom: 16px;
+      padding: 0;
+      position: relative;
+      overflow: hidden
+    }
+
+    .tprizes::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.4), transparent)
+    }
+
+    .tpz-title {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dim2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .tpz-total {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--g1);
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.6)
+    }
+
+    .tpz-rows {
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .tpz-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+      border-radius: 0;
+      transition: background 0.2s
+    }
+
+    .tpz-row:hover {
+      background: rgba(0, 255, 136, 0.04)
+    }
+
+    .tpz-pos {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .tpz-medal {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      flex-shrink: 0
+    }
+
+    .medal-1 {
+      background: linear-gradient(135deg, #FFD700, #FFA000);
+      color: #000;
+      box-shadow: 0 0 14px rgba(255, 215, 0, 0.5)
+    }
+
+    .medal-2 {
+      background: linear-gradient(135deg, #B0BEC5, #78909C);
+      color: #000;
+      box-shadow: 0 0 10px rgba(176, 190, 197, 0.3)
+    }
+
+    .medal-3 {
+      background: linear-gradient(135deg, #A1887F, #6D4C41);
+      color: #fff
+    }
+
+    .tpz-name {
+      font-size: 12px;
+      color: rgba(232, 255, 232, 0.75)
+    }
+
+    .tpz-amt {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--g1);
+      text-shadow: 0 0 14px rgba(0, 255, 136, 0.4)
+    }
+
+    .tpz-row:first-child .tpz-amt {
+      font-size: 18px;
+      color: var(--g1);
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.6)
+    }
+
+    .tpz-row:first-child .tpz-name {
+      color: var(--white);
+      font-weight: 600
+    }
+
+    .tpz-extra {
+      padding: 8px 16px 12px;
+      border-top: 1px solid rgba(0, 255, 136, 0.08);
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .tpz-tag {
+      font-size: 10px;
+      color: var(--dim2);
+      background: rgba(0, 255, 136, 0.05);
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      padding: 4px 11px;
+      transition: border-color 0.2s, color 0.2s
+    }
+
+    .tpz-tag:hover {
+      border-color: rgba(0, 255, 136, 0.3);
+      color: var(--g2)
+    }
+
+    .treg {
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgba(0, 255, 136, 0.25);
+      color: var(--g2);
+      padding: 12px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden
+    }
+
+    .treg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.3s
+    }
+
+    .treg:hover {
+      background: rgba(0, 255, 136, 0.08);
+      border-color: var(--g1);
+      color: var(--g1);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.15)
+    }
+
+    .treg:hover::after {
+      opacity: 1
+    }
+
+    .mbanner {
+      margin-top: 30px;
+      padding: 30px 38px;
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.06), rgba(0, 180, 60, 0.04));
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      flex-wrap: wrap;
+      transition: box-shadow 0.3s
+    }
+
+    .mbanner:hover {
+      box-shadow: 0 0 50px rgba(0, 255, 136, 0.08), inset 0 0 30px rgba(0, 255, 136, 0.02)
+    }
+
+    .mbicon {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--g1);
+      text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+      line-height: 1
+    }
+
+    .mbtitle {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 2px
+    }
+
+    .mbsub {
+      font-size: 13px;
+      color: var(--dim2);
+      margin-top: 4px
+    }
+
+    /* ══ GALLERY ══ */
+    #gallery {
+      background: var(--bg);
+    }
+
+    .ggrid {
+      display: grid;
+      grid-template-columns: repeat(2, 500px);
+      justify-content: center;
+      gap: 30px;
+      margin-top: 50px;
+    }
+
+    .gvid {
+      width: 500px;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #000;
+      border: 1px solid rgba(0, 255, 136, .15);
+    }
+
+
+    /* Hover effects */
+    .gvid:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 0 40px rgba(0, 255, 136, .2);
+    }
+
+    .gvid video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gvid:hover video {
+      transform: scale(1.08);
+    }
+
+    .gvid-over {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 0, 0, 0.3));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s;
+    }
+
+    .gvid-over::after {
+      font-size: 32px;
+      color: rgba(255, 255, 255, 0.5);
+      transition: transform 0.3s;
+    }
+
+    .gvid:hover .gvid-over::after {
+      transform: scale(1.2);
+      color: white;
+    }
+
+
+
+
+
+
+    /* ══ ABOUT ══ */
+    #about {
+      background: var(--bg2)
+    }
+
+    .agrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 70px;
+      align-items: start;
+      margin-top: 54px
+    }
+
+    .afeat {
+      display: flex;
+      gap: 18px;
+      padding: 22px;
+      border: 1px solid rgba(0, 255, 136, 0.06);
+      transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .afeat::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 0% 50%, rgba(0, 255, 136, 0.06), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s
+    }
+
+    .afeat:hover {
+      border-color: rgba(0, 255, 136, 0.25);
+      background: rgba(0, 255, 136, 0.03);
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.05)
+    }
+
+    .afeat:hover::after {
+      opacity: 1
+    }
+
+    .aicon {
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      background: rgba(0, 255, 136, 0.04);
+      transition: border-color 0.3s, box-shadow 0.3s
+    }
+
+    .afeat:hover .aicon {
+      border-color: rgba(0, 255, 136, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1)
+    }
+
+    .afeat h4 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+      letter-spacing: 1px
+    }
+
+    .afeat p {
+      font-size: 13px;
+      color: var(--dim2);
+      line-height: 1.7
+    }
+
+    .hcard {
+      background: var(--surface);
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      padding: 34px;
+      margin-bottom: 14px;
+      transition: box-shadow 0.3s
+    }
+
+    .hcard:hover {
+      box-shadow: 0 0 40px rgba(0, 255, 136, 0.06)
+    }
+
+    .hcard-t {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--g2);
+      letter-spacing: 3px;
+      margin-bottom: 22px
+    }
+
+    .hrow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0, 255, 136, 0.05);
+      font-size: 13px
+    }
+
+    .hrow:last-child {
+      border-bottom: none
+    }
+
+    .hday {
+      color: var(--dim2)
+    }
+
+    .htime {
+      color: var(--g2);
+      font-weight: 600;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      letter-spacing: 1px
+    }
+
+    .acard {
+      background: var(--surface);
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      padding: 26px;
+      transition: box-shadow 0.3s
+    }
+
+    .acard:hover {
+      box-shadow: 0 0 40px rgba(0, 255, 136, 0.06)
+    }
+
+    .al {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--dim2);
+      margin-bottom: 9px
+    }
+
+    .at {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+      line-height: 1.6
+    }
+
+    .clinks {
+      display: flex;
+      gap: 14px;
+      margin-top: 18px;
+      flex-wrap: wrap
+    }
+
+    .clinks a {
+      color: var(--g2);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.2s, text-shadow 0.2s
+    }
+
+    .clinks a:hover {
+      color: var(--g1);
+      text-shadow: 0 0 12px rgba(0, 255, 136, 0.5)
+    }
+
+    /* ══ FOOTER ══ */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid rgba(0, 255, 136, 0.08);
+      padding: 50px 24px 26px
+    }
+
+    .fin {
+      max-width: 1120px;
+      margin: 0 auto
+    }
+
+    .ftop {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 22px;
+      margin-bottom: 38px
+    }
+
+    .fbrand {
+      display: flex;
+      align-items: center;
+      gap: 13px
+    }
+
+    .fbrand img {
+      width: 120px;
+      height: 70px;
+
+    }
+
+    .fbrand span {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--g1)
+    }
+
+    .fnav {
+      display: flex;
+      gap: 26px;
+      flex-wrap: wrap
+    }
+
+    .fnav a {
+      color: var(--dim2);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 1px;
+      transition: color 0.2s
+    }
+
+    .fnav a:hover {
+      color: var(--g2)
+    }
+
+    .fbot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 26px;
+      border-top: 1px solid rgba(0, 255, 136, 0.06)
+    }
+
+    .fcopy {
+      font-size: 11px;
+      color: #2A3F2F
+    }
+
+    .fline {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: rgba(0, 255, 136, 0.2)
+    }
+
+    /* ══ MODAL ══ */
+    .mback {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s
+    }
+
+    .mback.open {
+      opacity: 1;
+      pointer-events: all
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      max-width: 460px;
+      width: 100%;
+      padding: 42px;
+      position: relative;
+      transform: translateY(18px);
+      transition: transform 0.3s;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(0, 255, 136, 0.05)
+    }
+
+    .mback.open .modal {
+      transform: translateY(0)
+    }
+
+    .modal::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--g3), var(--g1), var(--g2))
+    }
+
+    .mcls {
+      position: absolute;
+      top: 13px;
+      right: 13px;
+      background: none;
+      border: none;
+      color: var(--dim2);
+      font-size: 22px;
+      cursor: pointer;
+      transition: color 0.2s;
+      line-height: 1
+    }
+
+    .mcls:hover {
+      color: var(--err)
+    }
+
+    .mtitle {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--g1);
+      letter-spacing: 2px;
+      margin-bottom: 9px
+    }
+
+    .mdesc {
+      font-size: 13px;
+      color: var(--dim2);
+      line-height: 1.7;
+      margin-bottom: 22px
+    }
+
+    .mupi {
+      background: rgba(0, 255, 136, 0.04);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 18px
+    }
+
+    .mupi-l {
+      font-size: 9px;
+      color: var(--dim2);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 7px
+    }
+
+    .mupi-id {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      color: var(--g2);
+      letter-spacing: 2px
+    }
+
+    .mupi-amt {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--g1);
+      margin-top: 7px;
+      text-shadow: 0 0 30px rgba(0, 255, 136, 0.5)
+    }
+
+    .mpgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-bottom: 14px
+    }
+
+    .mpbtn {
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      background: rgba(0, 255, 136, 0.03);
+      padding: 13px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--dim2);
+      cursor: pointer;
+      transition: all 0.22s;
+      text-align: center
+    }
+
+    .mpbtn:hover {
+      border-color: var(--g2);
+      color: var(--g1);
+      background: rgba(0, 255, 136, 0.07);
+      box-shadow: 0 0 16px rgba(0, 255, 136, 0.1)
+    }
+
+    .mnote {
+      font-size: 11px;
+      color: #2A3F2F;
+      text-align: center
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width: 600px) {
+      body {
+        padding-top: 80px;
+        /* Less space needed on mobile */
+      }
+
+      nav {
+        height: 80px;
+        padding: 0 20px;
+        /* Tighter padding for mobile */
+      }
+
+      .nbrand img {
+        width: 70px;
+        /* Smaller logo for mobile */
+        height: auto;
+        opacity: 0;
+      }
+
+      /* This ensures the 'Book Now' button fits */
+      .nbtn {
+        padding: 8px 16px;
+        font-size: 9px;
+        letter-spacing: 1px;
+      }
+    }
+
+    nav,
+    nav.stuck {
+      padding: 13px 18px
+    }
+
+    .nlinks {
+      display: flex
+    }
+
+    .bgrid {
+      grid-template-columns: 1fr
+    }
+
+    .agrid {
+      grid-template-columns: 1fr
+    }
+
+    .ggrid {
+      grid-template-columns: repeat(2, 600px);
+    }
+
+    .gvid {
+      width: 600px;
+    }
+
+
+
+    .gvid video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .fgrow {
+      grid-template-columns: 1fr
+    }
+
+    .hstats {
+      flex-wrap: wrap
+    }
+
+    .hst {
+      padding: 18px 22px
+    }
+
+    section {
+      padding: 78px 18px
+    }
+
+    .scroll-to-top {
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+    }
+
+    /* Add this inside your <style> tag */
+    #entryLogo {
+      position: fixed;
+      z-index: 99999;
+      pointer-events: none;
+
+      top: 50%;
+      left: 50%;
+
+      width: 280px;
+
+      transform: translate(-50%, -50%);
+
+      opacity: 0;
+
+      will-change:
+        transform,
+        opacity,
+        top,
+        left;
+
+      backface-visibility: hidden;
+    }
+
+    /* Force the nav line to stay hidden until the end */
+
+
+
+    /* This creates the professional green "pop" effect */
+  </style>
+</head>
+
+<body>
+  <img src="img/logo2.png" id="entryLogo" alt="Logo" style="display:none;">
+
+  <button class="scroll-to-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+    aria-label="Scroll to top">
+    <svg width="16" height="16" viewBox="0 0 24 24">
+      <polygon points="12,4 4,12 9,12 9,20 15,20 15,12 20,12" />
+    </svg>
+  </button>
+
+  <div class="val-toast" id="valToast">
+    <div class="vt-icon">⚠</div>
+    <div class="vt-body">
+      <h5>FIELDS REQUIRED</h5>
+      <p id="vt-msg">Please fill in all required fields before proceeding.</p>
+      <div class="vt-fields" id="vtFields"></div>
+    </div>
+    <button class="vt-close" onclick="dismissToast()">×</button>
+  </div>
+
+  <div id="preloader">
+    <canvas id="preCanvas"></canvas>
+    <div class="pre-logo">
+      <div class="pre-bar">
+      </div>
+    </div>
+  </div>
+
+  <nav id="mainNav">
+    <div class="nbrand">
+      <img src="img/logo2.png" alt="Snooker Street">
+    </div>
+
+    <ul class="nlinks">
+      <li><a href="#tables">Tables</a></li>
+      <li><a href="#tournaments">Tournaments</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+
+    <a href="#booking" class="nbtn">Book Now</a>
+  </nav>
+
+  <section id="hero">
+    <video class="hvid" autoplay muted loop playsinline>
+      <source src="/mnt/user-data/uploads/video.mp4" type="video/mp4">
+    </video>
+    <div class="hvig"></div>
+    <div class="hfelt"></div>
+    <div class="hray"></div>
+    <div class="hray"></div>
+    <div class="hray"></div>
+    <div class="hcontent">
+      <div class="heyebrow">Jamnagar's Finest Game Zone</div>
+      <h1 class="hh1">
+        <span class="hl1">SNOOKER</span>
+        <span class="hl2">STREET</span>
+      </h1>
+      <p class="hsub">Pool tables. Snooker. PS5. Weekly tournaments. One address where champions are made.</p>
+      <div class="hctas">
+        <button class="btn-green" onclick="document.getElementById('booking').scrollIntoView({behavior:'smooth'})">Book
+          a Session</button>
+        <button class="btn-outline-g"
+          onclick="document.getElementById('tournaments').scrollIntoView({behavior:'smooth'})">View Tournaments</button>
+      </div>
+      <div class="hstats">
+        <div class="hst">
+          <div class="hst-n">2</div>
+          <div class="hst-l">Pool Tables</div>
+        </div>
+        <div class="hst">
+          <div class="hst-n">1</div>
+          <div class="hst-l">Snooker Table</div>
+        </div>
+        <div class="hst">
+          <div class="hst-n">2</div>
+          <div class="hst-l">PS5 Stations</div>
+        </div>
+        <div class="hst">
+          <div class="hst-n">52+</div>
+          <div class="hst-l">Tournaments / Year</div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-cue"><span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <div class="div"></div>
+
+  <section id="tables">
+    <div class="cnt">
+      <div class="rv"><span class="slabel">What We Offer</span></div>
+      <h2 class="sh2 rv d1">Pick Your <em>Game</em></h2>
+      <p class="sdesc rv d2">Professional equipment, competitive rates, zero hidden charges. Booking confirmed instantly
+        on payment.</p>
+      <div class="tgrid rv d2">
+        <div class="tc">
+          <div class="cglow"></div>
+          <div class="tcbgn">×2</div>
+          <div class="tctype">Pool Table · 2 Available</div>
+          <div class="tcname">8-Ball Pool</div>
+          <div class="tcprice">₹30</div>
+          <div class="tcpsub">per person &nbsp;·&nbsp; per game &nbsp;·&nbsp; 25 minutes</div>
+          <ul class="tcfeats">
+            <li>Full-size regulation pool table</li>
+            <li>25-minute timed sessions</li>
+            <li>Professional cues, chalk &amp; triangle</li>
+            <li>Two tables — run parallel sessions</li>
+            <li>Group bookings up to 4 players</li>
+          </ul>
+        </div>
+        <div class="tc">
+          <div class="cglow"></div>
+          <div class="tcbgn">×1</div>
+          <div class="tctype">Snooker Table · 1 Available</div>
+          <div class="tcname">English Snooker</div>
+          <div class="tcprice">₹50</div>
+          <div class="tcpsub">per person &nbsp;·&nbsp; per game &nbsp;·&nbsp; 30 minutes</div>
+          <ul class="tcfeats">
+            <li>Full 12×6 ft competition snooker table</li>
+            <li>30-minute timed sessions</li>
+            <li>Complete 22-ball set included</li>
+            <li>Rests, spiders &amp; all accessories</li>
+            <li>Coaching available on request</li>
+          </ul>
+        </div>
+        <div class="tc ps5">
+          <div class="cglow"></div>
+          <div class="tcbgn">×2</div>
+          <div class="tctype">Gaming Station · 2 Available</div>
+          <div class="tcname">PS5 + 4K TV</div>
+          <div class="tcprice">₹60</div>
+          <div class="tcpsub">per person &nbsp;·&nbsp; per hour</div>
+          <ul class="tcfeats">
+            <li>PlayStation 5 DualSense experience</li>
+            <li>55-inch 4K Smart TV per station</li>
+            <li>Latest titles — FIFA, COD, F1 &amp; more</li>
+            <li>Two stations, multiplayer head-to-head</li>
+            <li>Hourly sessions, book multiple hours</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="div"></div>
+
+  <section id="booking">
+    <div class="cnt">
+      <div class="rv"><span class="slabel">Reserve Your Slot</span></div>
+      <h2 class="sh2 rv d1">Advanced <em>Booking</em></h2>
+      <p class="sdesc rv d2">Booking confirmed only after successful online payment. Walk-ins subject to availability.
+      </p>
+      <div class="bgrid">
+        <div class="rv">
+          <div class="bsteps">
+            <div class="bstep">
+              <div class="bsnum">01</div>
+              <div class="bsbody">
+                <h4>Select Table &amp; Slot</h4>
+                <p>Pick pool, snooker, or PS5 and choose your date and time.</p>
+              </div>
+            </div>
+            <div class="bstep">
+              <div class="bsnum">02</div>
+              <div class="bsbody">
+                <h4>Add Player Details</h4>
+                <p>Enter your name, number, and player count — total calculates live.</p>
+              </div>
+            </div>
+            <div class="bstep">
+              <div class="bsnum">03</div>
+              <div class="bsbody">
+                <h4>Pay Online</h4>
+                <p>GPay, PhonePe, Paytm, or any UPI. Slot locked on payment.</p>
+              </div>
+            </div>
+            <div class="bstep">
+              <div class="bsnum">04</div>
+              <div class="bsbody">
+                <h4>Show &amp; Play</h4>
+                <p>Arrive on time, show the confirmation, and step up to the table.</p>
+              </div>
+            </div>
+          </div>
+          <div
+            style="margin-top:32px;padding:18px 22px;border-left:2px solid rgba(255,59,92,0.35);background:rgba(255,59,92,0.04)">
+            <div style="font-size:9px;letter-spacing:3px;color:var(--err);text-transform:uppercase;margin-bottom:7px">
+              Cancellation Policy</div>
+            <p style="font-size:13px;color:var(--dim2);line-height:1.7">Cancel 2+ hours before session for full refund.
+              No-shows and last-minute cancellations are non-refundable.</p>
+          </div>
+        </div>
+        <div class="bform rv d2">
+          <div class="ftitle">BOOK A SESSION</div>
+
+          <div class="fstep">
+            <div class="fstep-label"><span class="fstep-num">1</span> Choose Your Game <span class="freq">*</span></div>
+            <div class="tsel" id="tsel">
+              <div class="tso" data-table="Pool Table" data-price="30" data-dur="25 min" onclick="pickTable(this)">
+                <div class="tso-icon">🎱</div>
+                <span class="tsn">Pool</span>
+                <span class="tsp">₹30 · 25 min</span>
+              </div>
+              <div class="tso" data-table="Snooker Table" data-price="50" data-dur="30 min" onclick="pickTable(this)">
+                <div class="tso-icon">🟢</div>
+                <span class="tsn">Snooker</span>
+                <span class="tsp">₹50 · 30 min</span>
+              </div>
+              <div class="tso" data-table="PS5 Station" data-price="60" data-dur="1 hr" onclick="pickTable(this)">
+                <div class="tso-icon">🎮</div>
+                <span class="tsn">PS5</span>
+                <span class="tsp">₹60 · 1 hr</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="fstep">
+            <div class="fstep-label"><span class="fstep-num">2</span> Pick Date &amp; Time <span class="freq">*</span>
+            </div>
+            <div class="date-chips" id="dateChips"></div>
+            <div class="fgrow">
+              <div class="fg" id="fg-date">
+                <label>📅 Date</label>
+                <input type="date" id="bdate" oninput="calcSum();clearErr('fg-date','bdate');syncDateChips()">
+                <div class="ferr" id="ferr-date">Please select a date</div>
+              </div>
+              <div class="fg" id="fg-time">
+                <label>⏰ Time Slot</label>
+                <select id="btime" onchange="calcSum();clearErr('fg-time','btime')">
+                  <option value="">Pick a time…</option>
+                  <optgroup label="— Morning —">
+                    <option>11:00 AM</option>
+                    <option>11:30 AM</option>
+                    <option>12:00 PM</option>
+                    <option>12:30 PM</option>
+                  </optgroup>
+                  <optgroup label="— Afternoon —">
+                    <option>01:00 PM</option>
+                    <option>01:30 PM</option>
+                    <option>02:00 PM</option>
+                    <option>02:30 PM</option>
+                    <option>03:00 PM</option>
+                    <option>03:30 PM</option>
+                    <option>04:00 PM</option>
+                    <option>04:30 PM</option>
+                  </optgroup>
+                  <optgroup label="— Evening —">
+                    <option>05:00 PM</option>
+                    <option>05:30 PM</option>
+                    <option>06:00 PM</option>
+                    <option>06:30 PM</option>
+                    <option>07:00 PM</option>
+                    <option>07:30 PM</option>
+                    <option>08:00 PM</option>
+                    <option>08:30 PM</option>
+                    <option>09:00 PM</option>
+                    <option>09:30 PM</option>
+                    <option>10:00 PM</option>
+                  </optgroup>
+                </select>
+                <div class="ferr" id="ferr-time">Please select a time slot</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fstep">
+            <div class="fstep-label"><span class="fstep-num">3</span> Number of Players</div>
+            <div class="player-stepper">
+              <button class="ps-btn" onclick="changePlayers(-1)" aria-label="Less">−</button>
+              <div class="ps-display">
+                <span class="ps-num" id="playerNum">2</span>
+                <span class="ps-sub">players</span>
+              </div>
+              <button class="ps-btn" onclick="changePlayers(1)" aria-label="More">+</button>
+            </div>
+            <div class="player-icons" id="playerIcons">🧑🧑</div>
+            <input type="hidden" id="bplayers" value="2">
+          </div>
+
+          <div class="fstep">
+            <div class="fstep-label"><span class="fstep-num">4</span> Your Details <span class="freq">*</span></div>
+            <div class="fg" id="fg-name">
+              <label>👤 Full Name</label>
+              <input type="text" id="bname" placeholder="Enter your name"
+                oninput="clearErr('fg-name','bname');calcSum()" autocomplete="name">
+              <div class="ferr" id="ferr-name">Name cannot be empty</div>
+            </div>
+            <div class="fg" id="fg-phone">
+              <label>📞 Mobile Number</label>
+              <input type="tel" id="bphone" placeholder="10-digit mobile number"
+                oninput="clearErr('fg-phone','bphone');calcSum();formatPhone(this)" maxlength="10" autocomplete="tel"
+                inputmode="numeric">
+              <div class="fphone-hint"></div>
+              <div class="ferr" id="ferr-phone">Enter a valid 10-digit number</div>
+            </div>
+          </div>
+
+          <div class="psum" id="psum">
+            <div class="psum-title">📋 Booking Summary</div>
+            <div class="prow"><span>🎱 Table</span><span id="sumTable">—</span></div>
+            <div class="prow"><span>⏱ Duration</span><span id="sumDur">—</span></div>
+            <div class="prow"><span>💰 Rate</span><span id="sumBase">—</span></div>
+            <div class="prow tot"><span>Total Due</span><span id="sumTotal">₹0</span></div>
+          </div>
+
+          <div class="pnote">
+            <strong>⚡ Online payment only</strong> — booking confirmed after payment.<br>
+            <div class="payicons">
+              <span class="picon">GPay</span><span class="picon">PhonePe</span><span class="picon">Paytm</span><span
+                class="picon">UPI</span><span class="picon">BHIM</span>
+            </div>
+          </div>
+
+          <div id="payHint"
+            style="text-align:center;font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:12px;opacity:0.6">
+            Fill all fields to unlock payment ↓</div>
+
+          <button class="sbtn" id="payBtn" onclick="goToPay()" style="display:none">PROCEED TO PAY ▶</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="div"></div>
+
+  <section id="tournaments">
+    <div class="cnt">
+      <div class="trnhdr">
+        <div>
+          <div class="rv"><span class="slabel">Every Week</span></div>
+          <h2 class="sh2 rv d1">Weekly <em>Tournaments</em></h2>
+        </div>
+        <div class="lbadge">
+          <div class="ldot"></div>Registrations Open
+        </div>
+      </div>
+      <div class="trngrid rv">
+
+        <div class="tcard">
+          <div class="tglow"></div>
+          <div class="tw">Week 24 · Sat Jun 21, 2026 · 6:00 PM</div>
+          <div class="tname">Saturday Shootout</div>
+          <div class="tdets">
+            <div class="tdet">Format: <span>8-Ball Pool</span></div>
+            <div class="tdet">Slots: <span>16 max</span></div>
+            <div class="tdet">Entry: <span>₹150/player</span></div>
+            <div class="tdet">Structure: <span>Single Elimination</span></div>
+          </div>
+          <div class="tprizes">
+            <div class="tpz-title">
+              <span>Prize Breakdown</span>
+              <span class="tpz-total">₹1,500 Pool</span>
+            </div>
+            <div class="tpz-rows">
+              <div class="tpz-row">
+                <div class="tpz-pos">
+                  <div class="tpz-medal medal-1">1</div><span class="tpz-name">Champion</span>
+                </div>
+                <span class="tpz-amt">₹800</span>
+              </div>
+              <div class="tpz-row">
+                <div class="tpz-pos">
+                  <div class="tpz-medal medal-2">2</div><span class="tpz-name">Runner-up</span>
+                </div>
+                <span class="tpz-amt">₹450</span>
+              </div>
+              <div class="tpz-row">
+                <div class="tpz-pos">
+                  <div class="tpz-medal medal-3">3</div><span class="tpz-name">Semi-finalist</span>
+                </div>
+                <span class="tpz-amt">₹250</span>
+              </div>
+            </div>
+            <div class="tpz-extra">
+              <span class="tpz-tag">🏆 Trophy for winner</span>
+              <span class="tpz-tag">🎱 Free game voucher × 2</span>
+            </div>
+          </div>
+          <button class="treg" onclick="openM('Saturday Shootout','₹150')">Register Now</button>
+        </div>
+
+        <div class="tcard">
+          <div class="tglow"></div>
+          <div class="tw">Week 25 · Sun Jun 28, 2026 · 5:00 PM</div>
+          <div class="tname">Snooker Sunday Classic</div>
+          <div class="tdets">
+            <div class="tdet">Format: <span>English Snooker</span></div>
+            <div class="tdet">Slots: <span>8 max</span></div>
+            <div class="tdet">Entry: <span>₹200/player</span></div>
+            <div class="tdet">Structure: <span>Round Robin</span></div>
+          </div>
+          <div class="tprizes">
+            <div class="tpz-title">
+              <span>Prize Breakdown</span>
+              <span class="tpz-total">₹1,200 Pool</span>
+            </div>
+            <div class="tpz-rows">
+              <div class="tpz-row">
+                <div class="tpz-pos">
+                  <div class="tpz-medal medal-1">1</div><span class="tpz-name">Champion</span>
+                </div>
+                <span class="tpz-amt">₹700</span>
+              </div>
+              <div class="tpz-row">
+                <div class="tpz-pos">
+                  <div class="tpz-medal medal-2">2</div><span class="tpz-name">Runner-up</span>
+                </div>
+                <span class="tpz-amt">₹350</span>
+              </div>
+              <div class="tpz-row">
+                <div class="tpz-pos">
+                  <div class="tpz-medal medal-3">3</div><span class="tpz-name">3rd Place</span>
+                </div>
+                <span class="tpz-amt">₹150</span>
+              </div>
+            </div>
+            <div class="tpz-extra">
+              <span class="tpz-tag">🏆 Trophy for winner</span>
+              <span class="tpz-tag">🎯 Highest break bonus ₹100</span>
+            </div>
+          </div>
+          <button class="treg" onclick="openM('Snooker Sunday Classic','₹200')">Register Now</button>
+        </div>
+
+        <div class="tcard">
+          <div class="tglow"></div>
+          <div class="tw">Week 26 · Sat Jul 5, 2026 · 7:00 PM</div>
+          <div class="tname">Pool Night Open</div>
+          <div class="tdets">
+            <div class="tdet">Format: <span>9-Ball Pool</span></div>
+            <div class="tdet">Slots: <span>20 max</span></div>
+            <div class="tdet">Entry: <span>₹100/player</span></div>
+            <div class="tdet">Structure: <span>Double Elimination</span></div>
+          </div>
+          <div class="tprizes">
+            <div class="tpz-title">
+              <span>Prize Breakdown</span>
+              <span class="tpz-total">₹1,000 Pool</span>
+            </div>
+            <div class="tpz-rows">
+              <div class="tpz-row">
+                <div class="tpz-pos">
+                  <div class="tpz-medal medal-1">1</div><span class="tpz-name">Champion</span>
+                </div>
+                <span class="tpz-amt">₹550</span>
+              </div>
+              <div class="tpz-row">
+                <div class="tpz-pos">
+                  <div class="tpz-medal medal-2">2</div><span class="tpz-name">Runner-up</span>
+                </div>
+                <span class="tpz-amt">₹300</span>
+              </div>
+              <div class="tpz-row">
+                <div class="tpz-pos">
+                  <div class="tpz-medal medal-3">3</div><span class="tpz-name">Semi-finalist</span>
+                </div>
+                <span class="tpz-amt">₹150</span>
+              </div>
+            </div>
+            <div class="tpz-extra">
+              <span class="tpz-tag">🏆 Trophy for winner</span>
+              <span class="tpz-tag">🎱 Free session voucher</span>
+            </div>
+          </div>
+          <button class="treg" onclick="openM('Pool Night Open','₹100')">Register Now</button>
+        </div>
+
+      </div>
+
+      <div class="mbanner rv d2">
+        <div class="mbicon">🏆</div>
+        <div style="flex:1">
+          <div class="mbtitle">MONTHLY CHAMPIONSHIP</div>
+          <div class="mbsub">Last Saturday every month · Open to all weekly winners · ₹500 entry</div>
+          <div
+            style="margin-top:12px;padding:10px 16px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.1);display:inline-block">
+            <div style="font-size:9px;letter-spacing:3px;color:var(--dim2);text-transform:uppercase;margin-bottom:6px">
+              Monthly Prize Pool</div>
+            <div style="display:flex;gap:20px;flex-wrap:wrap">
+              <span style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700">🥇 Champion <span
+                  style="color:var(--g1)">₹3,000</span></span>
+              <span style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700">🥈 Runner-up <span
+                  style="color:var(--g2)">₹1,500</span></span>
+              <span style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700">🥉 3rd Place <span
+                  style="color:var(--dim2)">₹500</span></span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-outline-g" onclick="openM('Monthly Championship','₹500')">Register</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="div"></div>
+
+  <section id="gallery">
+    <div class="cnt">
+      <div class="rv"><span class="slabel">Inside the Zone</span></div>
+      <h2 class="sh2 rv d1">Own The <em>Table</em></h2>
+      <div class="ggrid rv d2">
+
+        <div class="gvid">
+          <video autoplay loop muted playsinline>
+            <source src="img/video0.mp4" type="video/mp4">
+          </video>
+        </div>
+
+        <div class="gvid">
+          <video autoplay loop muted playsinline>
+            <source src="img/video4.mp4" type="video/mp4">
+          </video>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="div"></div>
+
+  <section id="about">
+    <div class="cnt">
+      <div class="rv"><span class="slabel">The Zone</span></div>
+      <h2 class="sh2 rv d1">Why <em>Snooker Street</em></h2>
+      <div class="agrid">
+        <div>
+          <p class="sdesc rv" style="margin-bottom:30px">Not a fancy club — just the best game zone in the
+            neighbourhood. First-timers and serious competitors both feel at home.</p>
+          <div class="afeat rv d1">
+            <div class="aicon">🎱</div>
+            <div>
+              <h4>Pro-Grade Equipment</h4>
+              <p>Full-size tables, professional cues, fresh chalk, and perfect lighting every session.</p>
+            </div>
+          </div>
+          <div class="afeat rv d2">
+            <div class="aicon">🎮</div>
+            <div>
+              <h4>PS5 Corner</h4>
+              <p>Two PS5 stations with 4K TVs and the latest titles when you need a break from the table.</p>
+            </div>
+          </div>
+          <div class="afeat rv d3">
+            <div class="aicon">🏆</div>
+            <div>
+              <h4>Weekly Tournaments</h4>
+              <p>Compete every week — pool, snooker, and a monthly championship with real prize money.</p>
+            </div>
+          </div>
+          <div class="afeat rv d4">
+            <div class="aicon">⚡</div>
+            <div>
+              <h4>Instant Booking</h4>
+              <p>Book and pay in 2 minutes. Your slot is locked the moment payment clears.</p>
+            </div>
+          </div>
+        </div>
+        <div class="rv d2">
+          <div class="hcard">
+            <div class="hcard-t">OPENING HOURS</div>
+            <div class="hrow"><span class="hday">Monday – Friday</span><span class="htime">11 AM – 11 PM</span></div>
+            <div class="hrow"><span class="hday">Saturday</span><span class="htime">10 AM – 12 AM</span></div>
+            <div class="hrow"><span class="hday">Sunday</span><span class="htime">10 AM – 11 PM</span></div>
+            <div class="hrow"><span class="hday">Public Holidays</span><span class="htime">10 AM – 12 AM</span></div>
+          </div>
+          <div class="acard">
+            <div class="al">Location</div>
+            <div class="at">Snooker street,3rd floor,near wow gym hirji mistry road, Jamnagar, 361005<br> India</div>
+            <div class="clinks">
+              <a href="tel:+911234567890">📞 Call Us</a>
+              <a href="https://wa.me/911234567890" target="_blank">💬 WhatsApp</a>
+              <a href="https://www.instagram.com/snookerstreet" target="_blank">📸 Instagram</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="fin">
+      <div class="ftop">
+        <div class="fbrand">
+          <img src="img/logo2.png" alt="Snooker Street" onerror="this.style.display='none'">
+        </div>
+        <div class="fnav">
+          <a href="#tables">Tables & Pricing</a>
+          <a href="#booking">Book Now</a>
+          <a href="#tournaments">Tournaments</a>
+          <a href="#about">About</a>
+          <a href="#">Privacy Policy</a>
+        </div>
+      </div>
+      <div class="fbot">
+        <div class="fcopy">© 2026 Snooker Street. All rights reserved.</div>
+        <div class="fline">BREAK · PLAY · WIN</div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="mback" id="payModal">
+    <div class="modal">
+      <button class="mcls" onclick="closeM()">×</button>
+      <div class="mtitle" id="mTitle">CONFIRM & PAY</div>
+      <div class="mdesc" id="mDesc">Pay the amount below to confirm your booking. Screenshot as proof for the counter.
+      </div>
+      <div class="mupi">
+        <div class="mupi-l">UPI ID</div>
+        <div class="mupi-id">snookerstreet@upi</div>
+        <div class="mupi-amt" id="mAmt">₹60</div>
+      </div>
+      <div class="mpgrid">
+        <div class="mpbtn">📱 GPay</div>
+        <div class="mpbtn">📲 PhonePe</div>
+        <div class="mpbtn">💳 Paytm</div>
+        <div class="mpbtn">🔗 Any UPI</div>
+      </div>
+      <div class="mnote">WhatsApp your payment screenshot to confirm your slot.</div>
+    </div>
+  </div>
+
+  <script>
+
+    // ADD THIS AT THE VERY TOP OF YOUR SCRIPT
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById('mainNav').classList.remove('stuck');
+    });
+
+    /* ── PRELOADER ── */
+    // ... (rest of your script)
+    /* ── PRELOADER ── */
+    (function () {
+      const c = document.getElementById('preCanvas');
+      const ctx = c.getContext('2d');
+      let W, H, tick = 0;
+      function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight }
+      resize(); window.addEventListener('resize', resize);
+
+      const BALL_COLORS = ['#FF3B5C', '#FFD700', '#4FC3F7', '#00FF88', '#FF6B35', '#9C6BAE', '#00C853', '#111111', '#FF3B5C', '#FFD700', '#4FC3F7', '#00FF88', '#FF6B35', '#9C6BAE', '#00C853'];
+      const R = 11;
+      const DX = R * 2;
+      const DY = (R * 2) * 0.866025;
+
+      let balls = [];
+      let apexX, apexY;
+
+      function makeBalls() {
+        balls = [];
+        apexX = W * 0.70;
+        apexY = H / 2;
+
+        let bi = 0;
+        for (let col = 0; col < 5; col++) {
+          const count = 5 - col;
+          for (let row = 0; row < count; row++) {
+            const tx = apexX - col * DX;
+            const ty = apexY - (count - 1) * DY / 2 + row * DY;
+            balls.push({
+              x: tx, y: -R * 2,
+              tx, ty,
+              vx: 0, vy: 0,
+              r: R,
+              color: BALL_COLORS[bi % BALL_COLORS.length],
+              num: bi + 1,
+              alpha: 0,
+              settled: false
+            });
+            bi++;
+          }
+        }
+        balls[10].color = '#111111'; balls[10].num = 8; balls[10].isEight = true;
+
+        // Moving the cue ball target resting position further back to the left away from the triangle base
+        const cueTX = apexX - (4 * DX) - (W * 0.30);
+        balls.push({
+          x: -W * 0.35, y: apexY,
+          tx: cueTX, ty: apexY,
+          vx: 0, vy: 0, r: R,
+          color: '#F0F0E8', num: 0, alpha: 1, isCue: true
+        });
+      }
+      makeBalls();
+
+      function drawGrid() {
+
+        ctx.strokeStyle = 'rgba(0,255,136,0.022)'; ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 44) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke() }
+        for (let y = 0; y < H; y += 44) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke() }
+      }
+
+      function drawTable() {
+        const opacity = Math.min(1, tick / 50) * 0.45;
+        ctx.save(); ctx.globalAlpha = opacity;
+        const tw = Math.min(W * 0.76, 680), th = tw * 0.5;
+        const tx = (W - tw) / 2, ty = (H - th) / 2;
+        ctx.strokeStyle = 'rgba(0,255,136,0.14)'; ctx.lineWidth = 1.5; ctx.strokeRect(tx, ty, tw, th);
+        ctx.strokeStyle = 'rgba(0,180,60,0.07)'; ctx.lineWidth = 1; ctx.strokeRect(tx + 14, ty + 14, tw - 28, th - 28);
+        [[tx, ty], [tx + tw / 2, ty], [tx + tw, ty], [tx, ty + th], [tx + tw / 2, ty + th], [tx + tw, ty + th]].forEach(([px, py]) => {
+          ctx.beginPath(); ctx.arc(px, py, 9, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(0,255,136,0.18)'; ctx.lineWidth = 1.2; ctx.stroke();
+        });
+
+        ctx.restore();
+      }
+
+      function lighten(hex, amt) { try { const n = parseInt(hex.replace('#', ''), 16); return `rgb(${Math.min(255, ((n >> 16) & 255) + amt)},${Math.min(255, ((n >> 8) & 255) + amt)},${Math.min(255, (n & 255) + amt)})` } catch (e) { return hex } }
+      function darken(hex, amt) { try { const n = parseInt(hex.replace('#', ''), 16); return `rgb(${Math.max(0, ((n >> 16) & 255) - amt)},${Math.max(0, ((n >> 8) & 255) - amt)},${Math.max(0, (n & 255) - amt)})` } catch (e) { return hex } }
+
+      function drawBall(b) {
+        //if (b.alpha <= 0) return;
+        ctx.save(); ctx.globalAlpha = b.alpha;
+        const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * 2.6);
+        g.addColorStop(0, b.isEight ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.05)');
+        g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 2.6, 0, Math.PI * 2); ctx.fill();
+        const grad = ctx.createRadialGradient(b.x - b.r * 0.3, b.y - b.r * 0.35, b.r * 0.05, b.x, b.y, b.r);
+        grad.addColorStop(0, lighten(b.color, 55));
+        grad.addColorStop(0.5, b.color);
+        grad.addColorStop(1, darken(b.color, 55));
+        ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill();
+        if (b.num >= 9 && !b.isEight) {
+          ctx.save(); ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.clip();
+          ctx.fillStyle = 'rgba(240,240,232,0.88)'; ctx.fillRect(b.x - b.r, b.y - b.r * 0.36, b.r * 2, b.r * 0.72);
+          ctx.restore();
+        }
+        const sh = ctx.createRadialGradient(b.x - b.r * .33, b.y - b.r * .4, 0, b.x - b.r * .15, b.y - b.r * .15, b.r * .72);
+        sh.addColorStop(0, 'rgba(255,255,255,0.58)'); sh.addColorStop(0.4, 'rgba(255,255,255,0.1)'); sh.addColorStop(1, 'transparent');
+        ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fillStyle = sh; ctx.fill();
+        if (b.num > 0) {
+          ctx.fillStyle = b.isEight ? 'rgba(0,255,136,0.9)' : 'rgba(0,0,0,0.88)';
+          ctx.font = `bold ${Math.round(b.r * 0.8)}px Orbitron,sans-serif`;
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(b.num, b.x, b.y + 1);
+        }
+        ctx.restore();
+      }
+
+      function drawTriangleOutline(alpha) {
+        if (tick < 15) return;
+        const progress = Math.min(1, (tick - 15) / 55);
+        if (progress <= 0) return;
+
+        // Mathematical boundary correction: Adding standard cushion spacing outside ball touchpoints
+        const pad = 4;
+
+        const pApexX = apexX + pad;
+        const pApexY = apexY;
+
+        const pTopLeftX = apexX - (4 * DX) - (pad * 8);
+        const pTopLeftY = apexY - (4 * DY / 2) - 4;
+
+        const pBotLeftX = apexX - (4 * DX) - (pad * 8);
+        const pBotLeftY = apexY + (4 * DY / 2) + 4;
+
+        const sides = [
+          { from: { x: pApexX, y: pApexY }, to: { x: pTopLeftX, y: pTopLeftY } },
+          { from: { x: pTopLeftX, y: pTopLeftY }, to: { x: pBotLeftX, y: pBotLeftY } },
+          { from: { x: pBotLeftX, y: pBotLeftY }, to: { x: pApexX, y: pApexY } }
+        ];
+
+        const totalLen = sides.reduce((s, seg) => s + Math.hypot(seg.to.x - seg.from.x, seg.to.y - seg.from.y), 0);
+        let rem = progress * totalLen;
+        ctx.save();
+        ctx.globalAlpha = (alpha || 1) * Math.min(1, progress * 2) * 0.7;
+        ctx.strokeStyle = 'rgba(0,255,136,1)';
+        ctx.lineWidth = 1.5;
+        ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,255,136,0.8)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath(); ctx.moveTo(pApexX, pApexY);
+        for (const s of sides) {
+          const len = Math.hypot(s.to.x - s.from.x, s.to.y - s.from.y);
+          if (rem <= 0) break;
+          const f = Math.min(1, rem / len);
+          ctx.lineTo(s.from.x + (s.to.x - s.from.x) * f, s.from.y + (s.to.y - s.from.y) * f);
+          rem -= len;
+        }
+        ctx.stroke();
+        ctx.setLineDash([]); ctx.restore();
+      }
+
+      function drawCue(cue) {
+        if (tick < 85 || tick > 145) return;
+        const fadeIn = tick < 105 ? (tick - 85) / 20 : 1;
+        const fadeOut = tick > 130 ? Math.max(0, 1 - (tick - 130) / 15) : 1;
+        const alpha = Math.min(fadeIn, fadeOut) * 0.9;
+        ctx.save(); ctx.globalAlpha = alpha;
+        const tipX = cue.x - cue.r - 1;
+        ctx.strokeStyle = 'rgba(200,150,70,0.92)'; ctx.lineWidth = 5; ctx.lineCap = 'butt';
+        ctx.beginPath(); ctx.moveTo(tipX - 240, cue.y); ctx.lineTo(tipX - 10, cue.y); ctx.stroke();
+        ctx.strokeStyle = 'rgba(120,80,30,0.8)';
+        ctx.lineWidth = 7;
+        function drawCue(cue) {
+          if (tick < 85 || tick > 145) return;
+          const fadeIn = tick < 105 ? (tick - 85) / 20 : 1;
+          const fadeOut = tick > 130 ? Math.max(0, 1 - (tick - 130) / 15) : 1;
+          const alpha = Math.min(fadeIn, fadeOut) * 0.9;
+          ctx.save(); ctx.globalAlpha = alpha;
+          const tipX = cue.x - cue.r - 1;
+          ctx.strokeStyle = 'rgba(200,150,70,0.92)'; ctx.lineWidth = 5; ctx.lineCap = 'butt';
+          ctx.beginPath(); ctx.moveTo(tipX - 240, cue.y); ctx.lineTo(tipX - 10, cue.y); ctx.stroke();
+          ctx.strokeStyle = 'rgba(120,80,30,0.8)';
+          ctx.lineWidth = 7;
+          ctx.beginPath();
+          if (false) {
+            ctx.beginPath();
+            ctx.moveTo(tipX - 240, cue.y);
+            ctx.lineTo(tipX - 20, cue.y);
+            ctx.stroke();
+          }
+          ctx.strokeStyle = 'rgba(120,80,30,0.8)';
+          ctx.lineWidth = 7;
+          if (false) {
+            ctx.beginPath();
+            ctx.moveTo(tipX - 240, cue.y);
+            ctx.lineTo(tipX - 10, cue.y);
+            ctx.stroke();
+          }
+          if (false) {
+            ctx.beginPath();
+            ctx.moveTo(tipX, cue.y);
+            ctx.lineTo(cue.tx - cue.r * 3, cue.y);
+            ctx.stroke();
+          }
+          for (let i = 1; i <= 6; i++) {
+            ctx.beginPath();
+            ctx.arc(tipX + (i * 18), cue.y, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+          }
+          ctx.setLineDash([]); ctx.restore();
+        }
+
+        ctx.strokeStyle = 'rgba(120,80,30,0.8)';
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.moveTo(tipX - 240, cue.y);
+        ctx.lineTo(tipX - 20, cue.y);
+        ctx.stroke();
+        if (false) {
+          ctx.beginPath();
+          ctx.moveTo(tipX, cue.y);
+          ctx.lineTo(cue.tx - cue.r * 3, cue.y);
+          ctx.stroke();
+        }
+        for (let i = 1; i <= 6; i++) {
+          ctx.beginPath();
+          ctx.arc(tipX + (i * 18), cue.y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = 'white';
+          ctx.fill();
+        }
+        ctx.setLineDash([]); ctx.restore();
+      }
+
+
+      function draw() {
+
+        ctx.fillStyle = `rgba(0,0,0,${tick < 3 ? 1 : 0.2})`; ctx.fillRect(0, 0, W, H);
+        drawGrid();
+        drawTable();
+        tick++;
+
+        if (tick <= 65) {
+          balls.forEach((b, i) => {
+            if (b.isCue) return;
+
+            const t0 = i * 3.5;
+            const prog = Math.min(1, Math.max(0, (tick - t0) / 20));
+
+            b.alpha = Math.min(1, Math.max(0, (tick - t0) / 14));
+
+            const ease = 1 - Math.pow(1 - Math.min(1, prog), 3);
+            const bounce =
+              prog > 0 && prog < 1
+                ? Math.sin(prog * Math.PI) * 8 * (1 - prog) * 0.5
+                : 0;
+
+            b.x = b.tx;
+            b.y = b.ty - (1 - ease) * (b.ty + R * 2) - bounce;
+
+            if (prog >= 1) {
+              b.y = b.ty;
+              b.settled = true;
+            }
+          });
+        }
+
+        if (tick > 65 && tick <= 130) {
+          // drawTriangleOutline(1);
+          const cue = balls[balls.length - 1];
+          cue.alpha = Math.min(1, (tick - 65) / 18);
+          if (tick <= 110) {
+            const p = Math.min(1, (tick - 65) / 45);
+            const ease = 1 - Math.pow(1 - p, 3);
+            cue.x = cue.tx - (cue.tx - (-W * 0.35)) * (1 - ease);
+          } else {
+            cue.x = cue.tx;
+          }
+        }
+
+        if (tick === 130) {
+          const cue = balls[balls.length - 1];
+          cue.x = cue.tx; cue.y = cue.ty;
+          const apex = balls[14];
+          const ang = Math.atan2(apex.ty - cue.ty, apex.tx - cue.tx);
+          cue.vx = Math.cos(ang) * 11; cue.vy = Math.sin(ang) * 11; // Slightly amplified speed due to longer travel path
+          balls.forEach((b, i) => {
+            if (b.isCue) return;
+            const da = Math.atan2(b.ty - balls[14].ty, b.tx - balls[14].tx);
+            const dist = Math.hypot(b.ty - balls[14].ty, b.tx - balls[14].tx);
+            const spread = dist < 1 ? Math.random() * Math.PI * 2 : da;
+            const spd = 3.5 + Math.random() * 6 + dist * 0.03;
+            b.vx = Math.cos(spread + ((Math.random() - 0.5) * 0.5)) * spd;
+            b.vy = Math.sin(spread + ((Math.random() - 0.5) * 0.5)) * spd;
+          });
+        }
+
+        if (tick > 130 && tick <= 205) {
+          balls.forEach(b => {
+            b.x += b.vx; b.y += b.vy;
+            b.vx *= 0.955; b.vy *= 0.955;
+            const tw = Math.min(W * 0.76, 680);
+            const th = tw * 0.5;
+            const tx = (W - tw) / 2;
+            const ty = (H - th) / 2;
+
+            if (b.x < tx + b.r) {
+              b.x = tx + b.r;
+              b.vx = Math.abs(b.vx) * 0.72;
+            }
+
+            if (b.x > tx + tw - b.r) {
+              b.x = tx + tw - b.r;
+              b.vx = -Math.abs(b.vx) * 0.72;
+            }
+
+            if (b.y < ty + b.r) {
+              b.y = ty + b.r;
+              b.vy = Math.abs(b.vy) * 0.72;
+            }
+
+            if (b.y > ty + th - b.r) {
+              b.y = ty + th - b.r;
+              b.vy = -Math.abs(b.vy) * 0.72;
+            }
+          });
+          for (let i = 0; i < balls.length; i++) {
+            for (let j = i + 1; j < balls.length; j++) {
+              const a = balls[i], b = balls[j];
+              const dx = b.x - a.x, dy = b.y - a.y, dist = Math.hypot(dx, dy);
+              if (dist < a.r + b.r && dist > 0) {
+                const nx = dx / dist, ny = dy / dist;
+                const rv = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+                if (rv > 0) { a.vx -= rv * nx * 0.82; a.vy -= rv * ny * 0.82; b.vx += rv * nx * 0.82; b.vy += rv * ny * 0.82 }
+                const overlap = (a.r + b.r - dist) / 2;
+                a.x -= nx * overlap; a.y -= ny * overlap; b.x += nx * overlap; b.y += ny * overlap;
+              }
+            }
+          }
+        }
+
+        if (tick === 131) { ctx.fillStyle = 'rgba(0,255,136,0.22)'; ctx.fillRect(0, 0, W, H) }
+        if (tick === 132) { ctx.fillStyle = 'rgba(0,255,136,0.10)'; ctx.fillRect(0, 0, W, H) }
+
+        if (false) {
+          ctx.beginPath();
+          ctx.moveTo(tipX, cue.y);
+          ctx.lineTo(cue.tx - cue.r * 3, cue.y);
+          ctx.stroke();
+        }
+
+        let masterAlpha = 1;
+        if (tick > 198) masterAlpha = Math.max(0, 1 - (tick - 198) / 22);
+        ctx.save(); ctx.globalAlpha = masterAlpha;
+        drawCue(balls[balls.length - 1]);
+        balls.forEach(b => drawBall(b));
+        ctx.restore();
+
+        if (tick > 220) {
+
+          const pl = document.getElementById('preloader');
+          const entryLogo = document.getElementById('entryLogo');
+          const navLogoImg = document.querySelector('.nbrand img');
+
+
+          // remove balls/cue/table animation
+          document.getElementById('preCanvas').remove();
+
+          // keep background visible
+          entryLogo.style.display = 'block';
+
+          // START FROM VIEWER / CAMERA
+          entryLogo.style.width = '900px';
+          entryLogo.style.opacity = '0';
+          entryLogo.style.top = '50%';
+          entryLogo.style.left = '50%';
+          entryLogo.style.transform =
+            'translate(-50%,-50%) scale(4) rotateX(75deg)';
+          entryLogo.style.filter =
+            'drop-shadow(0 0 px #00ff88)' +
+            ' drop-shadow(0 0 2px rgba(0,255,136,.35))';
+          // fly in
+          requestAnimationFrame(() => {
+
+            entryLogo.style.transition =
+              'all 1.2s cubic-bezier(.16,1,.3,1)';
+
+            entryLogo.style.opacity = '1';
+
+            entryLogo.style.width = '280px';
+
+            entryLogo.style.transform =
+              'translate(-50%,-50%) scale(1) rotateX(0deg)';
+          });
+
+          setTimeout(() => { }, 1300);
+
+          // reveal website
+          setTimeout(() => {
+
+
+
+            document.body.style.overflow = 'auto';
+
+          }, 2200);
+
+          // merge into navbar logo
+          setTimeout(() => {
+
+            const navRect =
+              navLogoImg.getBoundingClientRect();
+
+            entryLogo.style.transition =
+              'all 0.7s cubic-bezier(.16,1,.3,1)';
+
+            entryLogo.style.top =
+              navRect.top + navRect.height / 2 + 'px';
+
+            entryLogo.style.left =
+              navRect.left + navRect.width / 2 + 'px';
+
+            entryLogo.style.width =
+              navRect.width + 'px';
+
+            entryLogo.style.transform =
+              'translate(-50%,-50%) scale(1)';
+
+            entryLogo.style.boxShadow =
+              'none';
+
+          }, 1200);
+
+          // finish
+          setTimeout(() => {
+
+            navLogoImg.style.opacity = '1';
+
+            pl.style.transition =
+              'opacity .8s ease';
+
+            pl.style.opacity = '0';
+
+            setTimeout(() => {
+
+              pl.style.display = 'none';
+              entryLogo.remove();
+
+            }, 800);
+
+          }, 1200);
+
+          return;
+        }
+        requestAnimationFrame(draw);
+      }
+      document.body.style.overflow = 'hidden';
+      requestAnimationFrame(draw);
+    })();
+
+    /* ── PARTICLES ── */
+    (function () {
+      const hero = document.getElementById('hero');
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement('div');
+        p.className = 'hparticle';
+        const sz = Math.random() * 3 + 1;
+        p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random() * 100}%;bottom:${Math.random() * 30}%;animation-duration:${6 + Math.random() * 10}s;animation-delay:${Math.random() * 8}s;opacity:${0.3 + Math.random() * 0.4}`;
+        hero.appendChild(p);
+      }
+    })();
+
+    /* ── DATE CHIPS ── */
+    (function () {
+      const container = document.getElementById('dateChips');
+      const inp = document.getElementById('bdate');
+      const today = new Date();
+      const chips = [
+        { label: 'Today', offset: 0 },
+        { label: 'Tomorrow', offset: 1 },
+        { label: 'Sat', offset: (6 - today.getDay() + 7) % 7 || 7 },
+        { label: 'Sun', offset: (0 - today.getDay() + 7) % 7 || 7 },
+      ];
+      chips.forEach(c => {
+        const d = new Date(today); d.setDate(today.getDate() + c.offset);
+        const val = d.toISOString().split('T')[0];
+        const chip = document.createElement('div');
+        chip.className = 'dchip';
+        chip.textContent = c.label + ' ' + (d.getDate()) + '/' + (d.getMonth() + 1);
+        chip.onclick = () => { inp.value = val; syncDateChips(); calcSum(); clearErr('fg-date', 'bdate') };
+        container.appendChild(chip);
+      });
+    })();
+    function syncDateChips() {
+      const val = document.getElementById('bdate').value;
+      document.querySelectorAll('.dchip').forEach((c, i) => {
+        const today = new Date(); const d = new Date(today);
+        const offsets = [0, 1, (6 - today.getDay() + 7) % 7 || 7, (0 - today.getDay() + 7) % 7 || 7];
+        d.setDate(today.getDate() + offsets[i]);
+        c.classList.toggle('active', val === d.toISOString().split('T')[0]);
+      });
+    }
+
+    /* ── PLAYER STEPPER ── */
+    let playerCount = 2;
+    function changePlayers(delta) {
+      playerCount = Math.min(10, Math.max(1, playerCount + delta));
+      document.getElementById('bplayers').value = playerCount;
+      document.getElementById('playerNum').textContent = playerCount;
+      const icons = ['🧑', '🧑🧑', '🧑🧑🧑', '🧑🧑🧑🧑', '🧑🧑🧑🧑🧑', '🧑🧑🧑🧑🧑🧑', '🧑🧑🧑🧑🧑🧑🧑', '🧑🧑🧑🧑🧑🧑🧑🧑', '🧑🧑🧑🧑🧑🧑🧑🧑🧑', '🧑🧑🧑🧑🧑🧑🧑🧑🧑🧑'];
+      document.getElementById('playerIcons').textContent = icons[playerCount - 1];
+      calcSum();
+    }
+
+    /* ── PHONE FORMATTER ── */
+    function formatPhone(inp) {
+      inp.value = inp.value.replace(/\D/g, '').slice(0, 10);
+    }
+
+    /* ── SCROLL EVENTS (NAV STUCK & SCROLL TO TOP) ── */
+    window.addEventListener('scroll', () => {
+      const mainNav = document.getElementById('mainNav');
+      const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+      // ONLY add the 'stuck' class if the preloader is GONE
+      if (document.getElementById('preloader').style.display === 'none') {
+        mainNav.classList.toggle('stuck', scrollY > 60);
+      }
+
+      scrollTopBtn.classList.toggle('show', scrollY > 300);
+    });
+
+    /* ── REVEAL ── */
+    const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('on') }), { threshold: 0.1 });
+    document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+    /* ── TABLE SELECT ── */
+    let selPrice = 0, selTable = '', selDur = '';
+    function pickTable(el) {
+      document.querySelectorAll('.tso').forEach(t => t.classList.remove('on'));
+      el.classList.add('on');
+      selPrice = +el.dataset.price; selTable = el.dataset.table; selDur = el.dataset.dur;
+      document.getElementById('tsel').classList.remove('tsel-err');
+      calcSum();
+    }
+    function calcSum() {
+      const d = document.getElementById('bdate').value;
+      const t = document.getElementById('btime').value;
+      const ps = document.getElementById('psum');
+      const payBtn = document.getElementById('payBtn');
+      const nm = document.getElementById('bname').value.trim();
+      const ph = document.getElementById('bphone').value.trim();
+      const allFilled = d && t && nm && ph.replace(/\D/g, '').length >= 10 && selTable;
+      if (d && t && selTable) {
+        ps.classList.add('on');
+        const n = playerCount;
+        document.getElementById('sumTable').textContent = selTable;
+        document.getElementById('sumBase').textContent = '₹' + selPrice + ' × ' + n + ' player' + (n > 1 ? 's' : '');
+        document.getElementById('sumDur').textContent = selDur;
+        document.getElementById('sumTotal').textContent = '₹' + (selPrice * n);
+      }
+      if (allFilled) {
+        document.getElementById('payHint').style.display = 'none';
+        if (payBtn.style.display === 'none') { payBtn.classList.remove('reveal'); payBtn.style.display = 'block'; void payBtn.offsetWidth; payBtn.classList.add('reveal') }
+      } else {
+        document.getElementById('payHint').style.display = 'block';
+        payBtn.style.display = 'none'; payBtn.classList.remove('reveal');
+      }
+    }
+
+    /* ── VALIDATION ── */
+    let toastTimer = null;
+    function showToast(fields) {
+      const toast = document.getElementById('valToast');
+      const ftags = document.getElementById('vtFields');
+      ftags.innerHTML = fields.map(f => `<span class="vt-field-tag">${f}</span>`).join('');
+      document.getElementById('vt-msg').textContent = `${fields.length} field${fields.length > 1 ? 's' : ''} need${fields.length === 1 ? 's' : ''} to be filled.`;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 5000);
+    }
+    function dismissToast() {
+      document.getElementById('valToast').classList.remove('show');
+      if (toastTimer) clearTimeout(toastTimer);
+    }
+    function markErr(fgId, inputId, msg) {
+      const fg = document.getElementById(fgId);
+      const inp = document.getElementById(inputId);
+      const ferr = document.getElementById('ferr-' + inputId.replace('b', ''));
+      inp.classList.add('err');
+      if (ferr) { ferr.textContent = msg || ferr.textContent; ferr.classList.add('show') }
+    }
+    function clearErr(fgId, inputId) {
+      document.getElementById(inputId).classList.remove('err');
+      const ferr = document.getElementById('ferr-' + inputId.replace('b', ''));
+      if (ferr) ferr.classList.remove('show');
+    }
+    function goToPay() {
+      const nm = document.getElementById('bname').value.trim();
+      const ph = document.getElementById('bphone').value.trim();
+      const d = document.getElementById('bdate').value;
+      const t = document.getElementById('btime').value;
+      const missing = [];
+      if (!selTable) {
+        const tselEl = document.getElementById('tsel');
+        tselEl.classList.add('tsel-err');
+        setTimeout(() => tselEl.classList.remove('tsel-err'), 1500);
+        missing.push('Session Type');
+      }
+      if (!d) { markErr('fg-date', 'bdate', 'Please select a date'); missing.push('Date') }
+      if (!t) { markErr('fg-time', 'btime', 'Please select a time slot'); missing.push('Time Slot') }
+      if (!nm) { markErr('fg-name', 'bname', 'Name cannot be empty'); missing.push('Your Name') }
+      if (!ph || ph.replace(/\D/g, '').length < 10) { markErr('fg-phone', 'bphone', 'Enter a valid 10-digit mobile'); missing.push('Mobile Number') }
+      if (missing.length > 0) {
+        showToast(missing);
+        const firstErr = document.querySelector('.tsel-err,.fg input.err,.fg select.err');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      const n = playerCount;
+      openM(selTable, '₹' + (selPrice * n), nm + "'s booking — " + selTable + ", " + n + " player(s) at " + t);
+    }
+
+    /* ── MODAL ── */
+    function openM(title, amt, desc) {
+      document.getElementById('mTitle').textContent = title.toUpperCase();
+      document.getElementById('mAmt').textContent = amt;
+      if (desc) document.getElementById('mDesc').textContent = desc;
+      document.getElementById('payModal').classList.add('open');
+    }
+    function closeM() { document.getElementById('payModal').classList.remove('open') }
+    document.getElementById('payModal').addEventListener('click', function (e) { if (e.target === this) closeM() });
+
+    /* ── VIDEO ── */
+    function toggleVid(vid, ov) {
+      const v = document.getElementById(vid), o = document.getElementById(ov);
+      if (v.paused) { v.play(); o.style.opacity = '0' }
+      else { v.pause(); o.style.opacity = '1' }
+    }
+
+    /* ── DATE MIN ── */
+    document.getElementById('bdate').min = new Date().toISOString().split('T')[0];
+  </script>
+</body>
+
+</html>
